@@ -11,7 +11,7 @@
 Today, a candidate copies a job description (JD) and a resume into a chatbot and asks it to quiz them. PrepRoom turns that manual routine into one product:
 
 1. Pick a **company and role**.
-2. PrepRoom finds the real **JD**, shows its source, and asks you to confirm it.
+2. Give PrepRoom the **job description (JD)**: paste it, upload a PDF, paste a job-page link, or let it look the JD up when the company publishes it openly. It always shows where the JD came from.
 3. Upload your **resume**. You get a **gap report**: where you match and where you lack, with evidence.
 4. An **AI interviewer** asks role-specific questions, adapts to your answers, and grades them.
 5. Ask follow-ups such as *"Where am I weakest?"*
@@ -127,7 +127,7 @@ Browser (React)
 |---|---|
 | 0 | Validation tests: JD fetch for 5 companies, Spring Boot on Render, real calls to Groq and Gemini, Atlas index test |
 | 1 | Project shell, login, resume upload, pasted JD, LLM provider switch |
-| 2 | JD fetch agent with source link, company pack cache, prompt-injection guard |
+| 2 | JD intake ladder: paste, PDF upload, URL fetch, public job-board lookup, graceful fallback; company pack cache; prompt-injection guard |
 | 3 | RAG, gap report, "where am I lacking?" chat |
 | 4 | Adaptive interviewer, grader, MCP tools, session storage |
 | 5 | Gateway rate limiter, queue and workers, circuit breaker, Nginx with 2 copies |
