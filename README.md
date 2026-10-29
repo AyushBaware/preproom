@@ -147,9 +147,11 @@ If time runs short, cut in this order: the live room, then live host adaptivity,
 - VS Code with Java and Spring Boot extension packs
 - Free accounts: MongoDB Atlas (PrepRoom project, Mumbai), Google AI Studio, Groq
 - Docker lab: Redis with a volume, Docker Compose, Nginx load balancing with a tested failover
+- Spring Boot 4.1 engine with Spring AI 2.0 calling Groq, and a MongoDB Atlas connection, both tested locally
+- First version deployed to Render's free tier: about 37 s startup, about 54 s wake-up after idle
 
 **Next**
-- First Spring Boot project (Step 3), then Week 0 tests
+- Week 1: resume PDF text extraction, structured JD extraction from text, storage in MongoDB, LLM provider fallback
 
 ---
 
