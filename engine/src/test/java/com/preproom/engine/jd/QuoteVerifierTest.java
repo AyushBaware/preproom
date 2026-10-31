@@ -34,4 +34,14 @@ class QuoteVerifierTest {
         assertThat(QuoteVerifier.appearsIn("", SOURCE)).isFalse();
         assertThat(QuoteVerifier.appearsIn(null, SOURCE)).isFalse();
     }
+
+    @Test
+    void lineBreakHyphenationIsIgnored() {
+        assertThat(QuoteVerifier.appearsIn("improve decision-making.", "improve decision-\nmaking.")).isTrue();
+    }
+
+    @Test
+    void veryShortQuotesAreRejected() {
+        assertThat(QuoteVerifier.appearsIn("R", "SQL, Python and/or R")).isFalse();
+    }
 }

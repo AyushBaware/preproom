@@ -1,26 +1,31 @@
 package com.preproom.engine.jd;
 
-import java.util.Locale;
-
-/** Checks that a quote really appears in the source text. */
+/** Checks that a quote really appears in the source text, ignoring case, spacing and punctuation. */
 public final class QuoteVerifier {
+
+    private static final int MIN_LETTERS_AND_DIGITS = 3;
 
     private QuoteVerifier() {}
 
     public static boolean appearsIn(String quote, String sourceText) {
-        if (quote == null || quote.isBlank() || sourceText == null) {
+        if (quote == null || sourceText == null) {
             return false;
         }
-        return normalize(sourceText).contains(normalize(quote));
+        String q = fingerprint(quote);
+        if (q.length() < MIN_LETTERS_AND_DIGITS) {
+            return false;
+        }
+        return fingerprint(sourceText).contains(q);
     }
 
-    static String normalize(String s) {
-        return s.toLowerCase(Locale.ROOT)
-                .replace('\u2018', '\'').replace('\u2019', '\'')
-                .replace('\u201c', '"').replace('\u201d', '"')
-                .replace('\u2013', '-').replace('\u2014', '-')
-                .replace('\u2022', ' ')
-                .replaceAll("[\\s\\u00a0]+", " ")
-                .trim();
+    /** Keeps only letters and digits, lower-cased, so line-break hyphens, bullets and curly quotes no longer matter. */
+    static String fingerprint(String s) {
+        StringBuilder sb = new StringBuilder(s.length());
+        s.codePoints().forEach(cp -> {
+            if (Character.isLetterOrDigit(cp)) {
+                sb.appendCodePoint(Character.toLowerCase(cp));
+            }
+        });
+        return sb.toString();
     }
 }

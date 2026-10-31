@@ -23,4 +23,10 @@ class JdVerifierTest {
         assertThat(result.jd().requiredSkills()).extracting(Item::text).containsExactly("React");
         assertThat(result.rejected()).hasSize(2);
     }
+
+    @Test
+    void letterSpacedHeaderTextIsRejected() {
+        assertThat(JdVerifier.looksLetterSpaced("P R E D I X I O N  A I  L T D .")).isTrue();
+        assertThat(JdVerifier.looksLetterSpaced("Predixion AI")).isFalse();
+    }
 }

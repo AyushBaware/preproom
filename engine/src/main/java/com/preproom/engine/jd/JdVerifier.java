@@ -32,8 +32,12 @@ public final class JdVerifier {
         return new ExtractionResult(cleaned, rejected);
     }
 
-    private static String scalar(String field, String value, String source, List<String> rejected) {
+        private static String scalar(String field, String value, String source, List<String> rejected) {
         if (value == null || value.isBlank()) {
+            return null;
+        }
+        if (looksLetterSpaced(value)) {
+            rejected.add(field + ": letter-spaced header text: " + value);
             return null;
         }
         if (QuoteVerifier.appearsIn(value, source)) {
@@ -41,6 +45,16 @@ public final class JdVerifier {
         }
         rejected.add(field + ": " + value);
         return null;
+    }
+
+    /** True for header text like "P R E D I X I O N", which PDFs produce from letter-spaced fonts. */
+    static boolean looksLetterSpaced(String value) {
+        String[] tokens = value.trim().split("\\s+");
+        if (tokens.length < 5) {
+            return false;
+        }
+        long singles = java.util.Arrays.stream(tokens).filter(t -> t.length() == 1).count();
+        return singles * 10 >= tokens.length * 6L;
     }
 
     private static List<Item> filter(String field, List<Item> items, String source, List<String> rejected) {
