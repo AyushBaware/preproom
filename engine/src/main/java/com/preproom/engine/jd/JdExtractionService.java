@@ -3,12 +3,18 @@ package com.preproom.engine.jd;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import com.preproom.engine.document.AiExtractionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class JdExtractionService {
 
     private static final int MAX_CHARS = 12_000;
 
-            private static final String SYSTEM = """
+    private static final Logger log = LoggerFactory.getLogger(JdExtractionService.class);
+
+        private static final String SYSTEM = """
             You extract structured data from a job description.
             Rules:
             - Use only what the document explicitly states. Never infer or add anything.
@@ -34,13 +40,20 @@ public class JdExtractionService {
         if (documentText.length() > MAX_CHARS) {
             throw new IllegalArgumentException("The document is longer than " + MAX_CHARS + " characters");
         }
-        JobDescription raw = chatClient.prompt()
-                .user(u -> u.text("Extract the job description below.\n\n<document>\n{document}\n</document>")
-                        .param("document", documentText))
-                .call()
-                .entity(JobDescription.class);
+        JobDescription raw;
+        try {
+            raw = chatClient.prompt()
+                    .user(u -> u.text("Extract the job description below.\n\n<document>\n{document}\n</document>")
+                            .param("document", documentText))
+                    .call()
+                    .entity(JobDescription.class);
+        } catch (RuntimeException e) {
+            log.warn("JD extraction failed", e);
+            throw new AiExtractionException(
+                    "The AI step failed. It may be rate-limited or its answer was cut off. Wait a minute and try again.", e);
+        }
         if (raw == null) {
-            throw new IllegalStateException("The model returned no structured result");
+            throw new AiExtractionException("The AI returned no answer. Try again.", null);
         }
         return JdVerifier.keepVerified(raw, documentText);
     }
