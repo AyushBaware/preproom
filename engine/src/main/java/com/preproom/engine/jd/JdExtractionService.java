@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import com.preproom.engine.document.AiExtractionException;
+import com.preproom.engine.document.RateLimitRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,11 +43,11 @@ public class JdExtractionService {
         }
         JobDescription raw;
         try {
-            raw = chatClient.prompt()
-                    .user(u -> u.text("Extract the job description below.\n\n<document>\n{document}\n</document>")
-                            .param("document", documentText))
-                    .call()
-                    .entity(JobDescription.class);
+            raw = RateLimitRetry.call(() -> chatClient.prompt()
+                .user(u -> u.text("Extract the job description below.\n\n<document>\n{document}\n</document>")
+                        .param("document", documentText))
+                .call()
+                .entity(JobDescription.class), 3, 25_000);
         } catch (RuntimeException e) {
             log.warn("JD extraction failed", e);
             throw new AiExtractionException(

@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import com.preproom.engine.document.AiExtractionException;
+import com.preproom.engine.document.RateLimitRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +44,11 @@ public class ResumeExtractionService {
         }
         Resume raw;
         try {
-            raw = chatClient.prompt()
-                    .user(u -> u.text("Extract the facts from the resume below.\n\n<document>\n{document}\n</document>")
-                            .param("document", text))
-                    .call()
-                    .entity(Resume.class);
+            raw = RateLimitRetry.call(() -> chatClient.prompt()
+                .user(u -> u.text("Extract the facts from the resume below.\n\n<document>\n{document}\n</document>")
+                        .param("document", text))
+                .call()
+                .entity(Resume.class), 3, 25_000);
         } catch (RuntimeException e) {
             log.warn("Resume extraction failed", e);
             throw new AiExtractionException(
