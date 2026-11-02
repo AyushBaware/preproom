@@ -19,7 +19,7 @@ public final class QuoteVerifier {
     }
 
     /** Keeps only letters and digits, lower-cased, so line-break hyphens, bullets and curly quotes no longer matter. */
-    static String fingerprint(String s) {
+    public static String fingerprint(String s) {
         StringBuilder sb = new StringBuilder(s.length());
         s.codePoints().forEach(cp -> {
             if (Character.isLetterOrDigit(cp)) {

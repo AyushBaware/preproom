@@ -202,3 +202,13 @@ preproom/
 - We never claim "Company X always asks Y". Questions come from the JD and the role.
 - Resumes are personal data. Free-tier AI gets synthetic data only, and the app stores the minimum.
 - The public demo runs a single instance. The multi-copy setup is shown in a recorded demo.
+
+## Measured so far (laptop: 2 cores, 12 GB RAM)
+
+| What | Result |
+|---|---|
+| JD extraction, first time | 5 to 15 s (Groq) |
+| JD extraction, cached | 0.4 s |
+| Gap report | about 8 s |
+| Render free tier startup | 74 s; first request after idle waits about 90 s |
+| Gap report vs my own judgement | 9 of 9 on one pair (small sample) |
