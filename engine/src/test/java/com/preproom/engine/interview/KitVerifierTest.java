@@ -33,4 +33,24 @@ class KitVerifierTest {
         assertThat(kit.questions().get(1).difficulty()).isEqualTo(3);
         assertThat(kit.rejected()).hasSize(3);
     }
+
+    @Test
+    void typeLimitsAreEnforced() {
+        List<QuestionSet.RawQuestion> many = new java.util.ArrayList<>();
+        for (int i = 1; i <= 7; i++) {
+            many.add(new QuestionSet.RawQuestion(1, "TECHNICAL", 2, "Technical question number " + i + "?",
+                    List.of("point a", "point b"), null));
+        }
+        InterviewKit kit = KitVerifier.build(new QuestionSet(many), Set.of(1), JD);
+        assertThat(kit.questions()).hasSize(5);
+        assertThat(kit.rejected()).hasSize(2);
+    }
+
+    @Test
+    void specialHyphensAreNormalised() {
+        QuestionSet raw = new QuestionSet(List.of(new QuestionSet.RawQuestion(1, "TECHNICAL", 2,
+                "Explain server\u2011side rendering.", List.of("point a", "point b"), null)));
+        assertThat(KitVerifier.build(raw, Set.of(1), JD).questions().get(0).text())
+                .isEqualTo("Explain server-side rendering.");
+    }
 }
