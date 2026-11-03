@@ -13,6 +13,12 @@ public final class KitVerifier {
     private static final Set<String> TYPES = Set.of("TECHNICAL", "BEHAVIORAL", "SCENARIO");
     private static final int MAX_QUESTION_CHARS = 300;
 
+    private static final List<String> STAR_POINTS = List.of(
+            "Describes a specific situation or task",
+            "Explains what the candidate personally did",
+            "States the result or outcome",
+            "Reflects on what was learned or would be done differently");
+
     private static final java.util.Map<String, Integer> LIMITS =
             java.util.Map.of("TECHNICAL", 5, "BEHAVIORAL", 2, "SCENARIO", 1);
 
@@ -49,7 +55,13 @@ public final class KitVerifier {
                 }
                 List<String> points = q.goodAnswerPoints() == null ? List.of()
                         : q.goodAnswerPoints().stream().filter(p -> p != null && !p.isBlank())
-                                .map(KitVerifier::normalizeText).toList();
+                                .map(KitVerifier::normalizeText)
+                                .filter(p -> p.length() <= 200)
+                                .limit(5)
+                                .toList();
+                if (type.equals("BEHAVIORAL")) {
+                    points = STAR_POINTS;
+                }
                 if (points.size() < 2) {
                     rejected.add("fewer than 2 answer points: " + text);
                     continue;

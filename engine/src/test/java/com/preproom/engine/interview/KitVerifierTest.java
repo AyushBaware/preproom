@@ -53,4 +53,20 @@ class KitVerifierTest {
         assertThat(KitVerifier.build(raw, Set.of(1), JD).questions().get(0).text())
                 .isEqualTo("Explain server-side rendering.");
     }
+
+    @Test
+    void answerPointsAreCappedAtFive() {
+        QuestionSet raw = new QuestionSet(List.of(new QuestionSet.RawQuestion(1, "TECHNICAL", 2,
+                "A question about caching?", List.of("p1", "p2", "p3", "p4", "p5", "p6", "p7"), null)));
+        assertThat(KitVerifier.build(raw, Set.of(1), JD).questions().get(0).goodAnswerPoints()).hasSize(5);
+    }
+
+    @Test
+    void behavioralQuestionsUseTheStarRubric() {
+        QuestionSet raw = new QuestionSet(List.of(new QuestionSet.RawQuestion(null, "BEHAVIORAL", 1,
+                "Tell me about a conflict you resolved.", List.of("x", "y"), null)));
+        List<String> points = KitVerifier.build(raw, Set.of(1), JD).questions().get(0).goodAnswerPoints();
+        assertThat(points).hasSize(4);
+        assertThat(points.get(0)).contains("situation");
+    }
 }
